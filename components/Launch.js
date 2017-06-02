@@ -25,7 +25,8 @@ class Launch extends React.Component {
     return (
       <View {...this.props}  style={styles.container}>
         <Text>Launch page</Text>
-        <Button onPress={Actions.mainscene}>Go to MainScene</Button>
+        <Button onPress={Actions.mainscene}>시작하기</Button>
+        <Button onPress={Actions.pop}>종료하기</Button>
       </View>
     );
   }
