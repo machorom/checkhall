@@ -4,6 +4,7 @@ import {
   Text,
   TouchableOpacity,
   Clipboard,
+  AsyncStorage,
   StyleSheet
 } from "react-native";
 
@@ -41,26 +42,18 @@ class Launch extends React.Component {
     return (
       <View {...this.props}  style={styles.container}>
         <PushController
-          onChangeToken={token => this.setState({token: token || ""})}
+          onChangeToken={async(token) => {
+            try{
+              const value = await AsyncStorage.getItem('@CheckHallStore:pushToken');
+              console.log("pretokenKey" + value)
+
+              console.log("copy token to AsyncStorage ", token);
+              await AsyncStorage.setItem('@CheckHallStore:pushToken', token);
+            } catch (error) {
+              console.log("copy token to AsyncStorage error ", error);
+            }
+          }}
         />
-        <Text selectable={true} onPress={() => this.setClipboardContent(this.state.token)}>
-          Token: {this.state.token}
-        </Text>
-        <Text >
-          {this.state.tokenCopyFeedback}
-        </Text>
-
-        <TouchableOpacity onPress={() => firebaseClient.sendNotification(token)} >
-          <Text>Send Notification</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => firebaseClient.sendData(token)} >
-          <Text >Send Data</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => firebaseClient.sendNotificationWithData(token)} >
-          <Text >Send Notification With Data</Text>
-        </TouchableOpacity>
 
         <Text>Launch page</Text>
         <Button onPress={Actions.mainscene}>시작하기</Button>

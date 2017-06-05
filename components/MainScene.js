@@ -3,6 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
+  AsyncStorage,
   WebView
 } from "react-native";
 
@@ -49,7 +50,7 @@ class MainScene extends React.Component {
     // Implement any custom loading logic here, don't forget to return!
   };
 
-  onNavigationStateChange = (navState) => {
+  onNavigationStateChange = async(navState) => {
     console.log("onNavigationStateChange ", navState);
     this.setState({
       backButtonEnabled: navState.canGoBack,
@@ -59,6 +60,12 @@ class MainScene extends React.Component {
       loading: navState.loading,
       scalesPageToFit: true
     });
+    try{
+        const value = await AsyncStorage.getItem('@CheckHallStore:pushToken');
+        console.log("pushToken " + value);
+    } catch(error) {
+      console.log("getPushToken error ", error);
+    }
   };
 
 
