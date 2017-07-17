@@ -51,7 +51,7 @@ class MainScene extends React.Component {
     // Implement any custom loading logic here, don't forget to return!
   };
 
-  onNavigationStateChange = async(navState) => {
+  onNavigationStateChange = (navState) => {
     //console.log("onNavigationStateChange ", navState);
     this.setState({
       backButtonEnabled: navState.canGoBack,
@@ -62,22 +62,28 @@ class MainScene extends React.Component {
       scalesPageToFit: true
     });
     this.postTokenId("A0D9C7C23491D46E04E4BF0CBAD7BAD7");
-    // try{
-    //     const value = await AsyncStorage.getItem('@CheckHallStore:pushToken');
-    //     console.log("pushToken " + value);
-    // } catch(error) {
-    //   console.log("getPushToken error ", error);
-    // }
+
   };
 
-  postTokenId = (deviceid) => {
+  postTokenId = async(deviceid) => {
+    var tokenValue = "";
+    try{
+        tokenValue = await AsyncStorage.getItem('@CheckHallStore:pushToken');
+        console.log("getDeviceTokenId " + tokenValue);
+    } catch(error) {
+        console.log("getDeviceTokenId error ", error);
+        return;
+    }
 
     var params = {
       'idx': deviceid,
       'device_id': '0f365b39-c33d-39be-bdfc-74aaf5534470',
       'push_type': 'fcm',
-      'push_token': 'APA91bEZ3fjwrKV2mxAFvZMC960zKBWBVffLErwZgFzsFnzzsxgi5lSQlq3zvzObZBe4OnbwkTZfMqV7_a6fF0AJNgUjt5Scpo2BTaHyLVlK54QmwIQBahUwJprKjj0YvF_rh8l7CTvl6TRxqlqO_NIwaoAcI0MssA'
+      'push_token': tokenValue
     };
+
+    console.log("postTokenId params ", params);
+
     var formBody = [];
     for (var property in params) {
       var encodedKey = encodeURIComponent(property);
