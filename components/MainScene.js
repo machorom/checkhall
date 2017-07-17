@@ -46,12 +46,13 @@ class MainScene extends React.Component {
   }
 
   onMessage = (message) => {
+    console.log("onMessage ", "1231412312");
     console.log("onMessage ", message);
     // Implement any custom loading logic here, don't forget to return!
   };
 
   onNavigationStateChange = async(navState) => {
-    console.log("onNavigationStateChange ", navState);
+    //console.log("onNavigationStateChange ", navState);
     this.setState({
       backButtonEnabled: navState.canGoBack,
       forwardButtonEnabled: navState.canGoForward,
@@ -60,12 +61,45 @@ class MainScene extends React.Component {
       loading: navState.loading,
       scalesPageToFit: true
     });
-    try{
-        const value = await AsyncStorage.getItem('@CheckHallStore:pushToken');
-        console.log("pushToken " + value);
-    } catch(error) {
-      console.log("getPushToken error ", error);
+    this.postTokenId("A0D9C7C23491D46E04E4BF0CBAD7BAD7");
+    // try{
+    //     const value = await AsyncStorage.getItem('@CheckHallStore:pushToken');
+    //     console.log("pushToken " + value);
+    // } catch(error) {
+    //   console.log("getPushToken error ", error);
+    // }
+  };
+
+  postTokenId = (deviceid) => {
+
+    var params = {
+      'idx': deviceid,
+      'device_id': '0f365b39-c33d-39be-bdfc-74aaf5534470',
+      'push_type': 'fcm',
+      'push_token': 'APA91bEZ3fjwrKV2mxAFvZMC960zKBWBVffLErwZgFzsFnzzsxgi5lSQlq3zvzObZBe4OnbwkTZfMqV7_a6fF0AJNgUjt5Scpo2BTaHyLVlK54QmwIQBahUwJprKjj0YvF_rh8l7CTvl6TRxqlqO_NIwaoAcI0MssA'
+    };
+    var formBody = [];
+    for (var property in params) {
+      var encodedKey = encodeURIComponent(property);
+      var encodedValue = encodeURIComponent(params[property]);
+      formBody.push(encodedKey + "=" + encodedValue);
     }
+    formBody = formBody.join("&");
+    var request = {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: formBody
+    };
+    fetch("http://m.checkhall.com/member/setPushToken.jsp", request)
+      .then((response) =>{
+        console.info(response);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
 
