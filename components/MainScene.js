@@ -10,8 +10,6 @@ import {
 import Button from "react-native-button";
 import {Actions} from "react-native-router-flux";
 
-
-var WEBVIEW_REF = 'webview';
 var DEFAULT_URL = 'http://www.checkhall.com';
 
 class MainScene extends React.Component {
@@ -28,7 +26,7 @@ class MainScene extends React.Component {
     return (
       <View {...this.props}  style={styles.container}>
         <WebView
-          ref={WEBVIEW_REF}
+          ref={webview => { this.webview = webview; }}
           style={styles.webView}
           automaticallyAdjustContentInsets={false}
           source={{uri: this.state.url}}
@@ -45,13 +43,25 @@ class MainScene extends React.Component {
     );
   }
 
-  onMessage = (message) => {
-    console.log("onMessage ", message);
-    // Implement any custom loading logic here, don't forget to return!
+  parsingDeviceId = (param) => {
+    console.log("parsingDeviceId param", param);
+    deviceid = param.replace('function f_get_idx(){\n\tconsole.log("{\\"idx\\":\\"','');
+    deviceid = deviceid.replace('\\"}");\t\n}','');
+    console.log("parsingDeviceId result="+deviceid);
+    return deviceid;
   };
 
-  onNavigationStateChange = async(navState) => {
-    console.log("onNavigationStateChange ", navState);
+  onMessage = (message) => {
+    if (typeof(message.nativeEvent.data) != 'undefined' && message.nativeEvent.data != null){
+      console.log("onMessage ", message.nativeEvent.data);
+      if(message.nativeEvent.data.indexOf("f_get_idx") > 0 ){
+        this.postTokenId(this.parsingDeviceId(message.nativeEvent.data));
+      }
+    }
+  };
+
+  onNavigationStateChange = (navState) => {
+    //console.log("onNavigationStateChange ", navState);
     this.setState({
       backButtonEnabled: navState.canGoBack,
       forwardButtonEnabled: navState.canGoForward,
@@ -60,12 +70,56 @@ class MainScene extends React.Component {
       loading: navState.loading,
       scalesPageToFit: true
     });
-    try{
-        const value = await AsyncStorage.getItem('@CheckHallStore:pushToken');
-        console.log("pushToken " + value);
-    } catch(error) {
-      console.log("getPushToken error ", error);
+    if(navState.url == "http://www.checkhall.com/plan/search/"){
+      console.info("call injectJavaScript ", navState);
+      this.webview.injectJavaScript("window.postMessage(window.f_get_idx);");
     }
+  };
+
+  postTokenId = async(deviceid) => {
+    var tokenValue = "";
+    var deviceUniqueValue = "";
+    try{
+        tokenValue = await AsyncStorage.getItem('@CheckHallStore:pushToken');
+        deviceUniqueValue = await AsyncStorage.getItem('@CheckHallStore:deviceUniqueId');
+        console.log("tokenValue " + tokenValue);
+        console.log("deviceUniqueValue " + deviceUniqueValue);
+    } catch(error) {
+        console.log("getDeviceTokenId error ", error);
+        return;
+    }
+
+    var params = {
+      'idx': deviceid,
+      'device_id': deviceUniqueValue,
+      'push_type': 'fcm',
+      'push_token': tokenValue
+    };
+
+    console.log("postTokenId params ", params);
+
+    var formBody = [];
+    for (var property in params) {
+      var encodedKey = encodeURIComponent(property);
+      var encodedValue = encodeURIComponent(params[property]);
+      formBody.push(encodedKey + "=" + encodedValue);
+    }
+    formBody = formBody.join("&");
+    var request = {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: formBody
+    };
+    fetch("http://m.checkhall.com/member/setPushToken.jsp", request)
+      .then((response) =>{
+        console.info(response);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
 
