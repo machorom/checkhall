@@ -10,8 +10,6 @@ import {
 import Button from "react-native-button";
 import {Actions} from "react-native-router-flux";
 
-
-var WEBVIEW_REF = 'webview';
 var DEFAULT_URL = 'http://www.checkhall.com';
 
 class MainScene extends React.Component {
@@ -28,7 +26,7 @@ class MainScene extends React.Component {
     return (
       <View {...this.props}  style={styles.container}>
         <WebView
-          ref={WEBVIEW_REF}
+          ref={webview => { this.webview = webview; }}
           style={styles.webView}
           automaticallyAdjustContentInsets={false}
           source={{uri: this.state.url}}
@@ -45,10 +43,21 @@ class MainScene extends React.Component {
     );
   }
 
+  parsingDeviceId = (param) => {
+    console.log("parsingDeviceId param", param);
+    deviceid = param.replace('function f_get_idx(){\n\tconsole.log("{\\"idx\\":\\"','');
+    deviceid = deviceid.replace('\\"}");\t\n}','');
+    console.log("parsingDeviceId result="+deviceid);
+    return deviceid;
+  };
+
   onMessage = (message) => {
-    console.log("onMessage ", "1231412312");
-    console.log("onMessage ", message);
-    // Implement any custom loading logic here, don't forget to return!
+    if (typeof(message.nativeEvent.data) != 'undefined' && message.nativeEvent.data != null){
+      console.log("onMessage ", message.nativeEvent.data);
+      if(message.nativeEvent.data.indexOf("f_get_idx") > 0 ){
+        this.postTokenId(this.parsingDeviceId(message.nativeEvent.data));
+      }
+    }
   };
 
   onNavigationStateChange = (navState) => {
@@ -61,8 +70,10 @@ class MainScene extends React.Component {
       loading: navState.loading,
       scalesPageToFit: true
     });
-    this.postTokenId("A0D9C7C23491D46E04E4BF0CBAD7BAD7");
-
+    if(navState.url == "http://www.checkhall.com/plan/search/"){
+      console.info("call injectJavaScript ", navState);
+      this.webview.injectJavaScript("window.postMessage(window.f_get_idx);");
+    }
   };
 
   postTokenId = async(deviceid) => {
