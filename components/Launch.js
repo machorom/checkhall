@@ -14,6 +14,8 @@ import {Actions} from "react-native-router-flux";
 import PushController from "../app/PushController";
 import firebaseClient from  "../app/FirebaseClient";
 
+import DeviceInfo from 'react-native-device-info';
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -33,6 +35,26 @@ class Launch extends React.Component {
       token: "",
       tokenCopyFeedback: ""
     }
+    this.setDeviceUniqueId(DeviceInfo.getUniqueID());
+    console.log("getVersion = " + DeviceInfo.getVersion());
+    console.log("getUniqueID = " + DeviceInfo.getUniqueID());
+    console.log("getManufacturer = " + DeviceInfo.getManufacturer());
+    console.log("getBrand = " + DeviceInfo.getBrand());
+    console.log("getModel = " + DeviceInfo.getModel());
+    console.log("getDeviceId = " + DeviceInfo.getDeviceId());
+    console.log("getSystemName = " + DeviceInfo.getSystemName());
+    console.log("getSystemVersion = " + DeviceInfo.getSystemVersion());
+    console.log("getBundleId = " + DeviceInfo.getBundleId());
+    console.log("getBuildNumber = " + DeviceInfo.getBuildNumber());
+    console.log("getDeviceName = " + DeviceInfo.getDeviceName());
+    console.log("getUserAgent = " + DeviceInfo.getUserAgent());
+  }
+
+  setDeviceUniqueId = async(uniqueId) => {
+    const value = await AsyncStorage.getItem('@CheckHallStore:deviceUniqueId');
+    console.log("pre deviceUniqueId", value);
+    await AsyncStorage.setItem('@CheckHallStore:deviceUniqueId', uniqueId);
+    console.log("copy deviceUniqueId to AsyncStorage", uniqueId);
   }
 
   render(){

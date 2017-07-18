@@ -78,9 +78,12 @@ class MainScene extends React.Component {
 
   postTokenId = async(deviceid) => {
     var tokenValue = "";
+    var deviceUniqueValue = "";
     try{
         tokenValue = await AsyncStorage.getItem('@CheckHallStore:pushToken');
-        console.log("getDeviceTokenId " + tokenValue);
+        deviceUniqueValue = await AsyncStorage.getItem('@CheckHallStore:deviceUniqueId');
+        console.log("tokenValue " + tokenValue);
+        console.log("deviceUniqueValue " + deviceUniqueValue);
     } catch(error) {
         console.log("getDeviceTokenId error ", error);
         return;
@@ -88,7 +91,7 @@ class MainScene extends React.Component {
 
     var params = {
       'idx': deviceid,
-      'device_id': '0f365b39-c33d-39be-bdfc-74aaf5534470',
+      'device_id': deviceUniqueValue,
       'push_type': 'fcm',
       'push_token': tokenValue
     };
