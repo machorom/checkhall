@@ -5,7 +5,8 @@ import {
   TouchableOpacity,
   Clipboard,
   AsyncStorage,
-  StyleSheet
+  StyleSheet,
+  Image
 } from "react-native";
 
 import Button from "react-native-button";
@@ -19,12 +20,34 @@ import DeviceInfo from 'react-native-device-info';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "transparent",
-    borderWidth: 2,
-    borderColor: 'red',
-  }
+    flexDirection: 'column',
+    justifyContent: 'center'
+  },
+  content: {
+    alignItems: 'center',
+    marginBottom: 40
+  },
+  footer: {
+    height: 95,
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  box: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  backgroundImage: {
+    flex: 1,
+    width: null,
+    height: null,
+    resizeMode: 'cover'
+  },
+  startButton : {
+    width: 350,
+    height: 60,
+  },
 });
 
 class Launch extends React.Component {
@@ -62,25 +85,34 @@ class Launch extends React.Component {
     let { token, tokenCopyFeedback } = this.state;
 
     return (
-      <View {...this.props}  style={styles.container}>
-        <PushController
-          onChangeToken={async(token) => {
-            try{
-              const value = await AsyncStorage.getItem('@CheckHallStore:pushToken');
-              console.log("pretokenKey" + value)
 
-              console.log("copy token to AsyncStorage ", token);
-              await AsyncStorage.setItem('@CheckHallStore:pushToken', token);
-            } catch (error) {
-              console.log("copy token to AsyncStorage error ", error);
-            }
-          }}
-        />
+        <Image style={styles.backgroundImage}
+            source={require('./image/launcher_bg.png')}>
+          <PushController
+            onChangeToken={async(token) => {
+              try{
+                const value = await AsyncStorage.getItem('@CheckHallStore:pushToken');
+                console.log("pretokenKey" + value)
+                console.log("copy token to AsyncStorage ", token);
+                await AsyncStorage.setItem('@CheckHallStore:pushToken', token);
+              } catch (error) {
+                console.log("copy token to AsyncStorage error ", error);
+              }
+            }}
+          />
+          <View style={styles.container}>
+            <View style={[styles.content]} />
+            <View style={[styles.footer]}>
+              <View style={[styles.box]}>
+                <TouchableOpacity onPress={Actions.mainscene}>
+                  <Image source={require('./image/bt_start.png')}
+                        style={styles.startButton}/>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Image>
 
-        <Text>Launch page</Text>
-        <Button onPress={Actions.mainscene}>시작하기</Button>
-        <Button onPress={Actions.pop}>종료하기</Button>
-      </View>
     );
   }
 }
