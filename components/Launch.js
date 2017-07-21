@@ -14,7 +14,7 @@ import {Actions} from "react-native-router-flux";
 
 import PushController from "../app/PushController";
 import firebaseClient from  "../app/FirebaseClient";
-
+import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from "react-native-fcm";
 import DeviceInfo from 'react-native-device-info';
 
 const styles = StyleSheet.create({
@@ -58,7 +58,16 @@ class Launch extends React.Component {
       token: "",
       tokenCopyFeedback: ""
     }
+
+    FCM.getInitialNotification().then(notif => {
+      console.log("[Launch]INITIAL NOTIFICATION", notif);
+      if( notif.click_action != null ){
+        Actions.mainscene({linkUrl : notif.click_action});
+      }
+    });
+
     this.setDeviceUniqueId(DeviceInfo.getUniqueID());
+    console.log("[Launch] DeviceInfo");
     console.log("getVersion = " + DeviceInfo.getVersion());
     console.log("getUniqueID = " + DeviceInfo.getUniqueID());
     console.log("getManufacturer = " + DeviceInfo.getManufacturer());
@@ -71,32 +80,32 @@ class Launch extends React.Component {
     console.log("getBuildNumber = " + DeviceInfo.getBuildNumber());
     console.log("getDeviceName = " + DeviceInfo.getDeviceName());
     console.log("getUserAgent = " + DeviceInfo.getUserAgent());
+    console.log("================================================");
   }
+
+
 
   setDeviceUniqueId = async(uniqueId) => {
     const value = await AsyncStorage.getItem('@CheckHallStore:deviceUniqueId');
-    console.log("pre deviceUniqueId", value);
+    console.log("[Launch]pre deviceUniqueId", value);
     await AsyncStorage.setItem('@CheckHallStore:deviceUniqueId', uniqueId);
-    console.log("copy deviceUniqueId to AsyncStorage", uniqueId);
+    console.log("[Launch]copy deviceUniqueId to AsyncStorage", uniqueId);
   }
 
   render(){
-
     let { token, tokenCopyFeedback } = this.state;
-
     return (
-
         <Image style={styles.backgroundImage}
             source={require('./image/launcher_bg.png')}>
           <PushController
             onChangeToken={async(token) => {
               try{
                 const value = await AsyncStorage.getItem('@CheckHallStore:pushToken');
-                console.log("pretokenKey" + value)
-                console.log("copy token to AsyncStorage ", token);
+                console.log("[Launch] pre token" + value)
+                console.log("[Launch] copy token to AsyncStorage ", token);
                 await AsyncStorage.setItem('@CheckHallStore:pushToken', token);
               } catch (error) {
-                console.log("copy token to AsyncStorage error ", error);
+                console.log("[Launch] copy token to AsyncStorage error ", error);
               }
             }}
           />
@@ -112,9 +121,7 @@ class Launch extends React.Component {
             </View>
           </View>
         </Image>
-
     );
   }
 }
-
 module.exports = Launch;

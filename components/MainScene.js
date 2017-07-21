@@ -13,6 +13,14 @@ import {Actions} from "react-native-router-flux";
 var DEFAULT_URL = 'http://www.checkhall.com/member/login.jsp';
 
 class MainScene extends React.Component {
+  constructor(props) {
+    super(props);
+    console.log("[MainScene] props = "+  JSON.stringify(props) );
+    if (props.linkUrl != null){
+      DEFAULT_URL = props.linkUrl;
+    }
+  }
+
   state = {
       url: DEFAULT_URL,
       status: 'No Page Loaded',
@@ -44,16 +52,16 @@ class MainScene extends React.Component {
   }
 
   parsingDeviceId = (param) => {
-    console.log("parsingDeviceId param", param);
+    console.log("[MainScene] parsing DeviceId param", param);
     deviceid = param.replace('function f_get_idx(){\n\tconsole.log("{\\"idx\\":\\"','');
     deviceid = deviceid.replace('\\"}");\t\n}','');
-    console.log("parsingDeviceId result="+deviceid);
+    console.log("[MainScene] parsing DeviceId result", deviceid);
     return deviceid;
   };
 
   onMessage = (message) => {
     if (typeof(message.nativeEvent.data) != 'undefined' && message.nativeEvent.data != null){
-      console.log("onMessage ", message.nativeEvent.data);
+      console.log("[MainScene] onMessage ", message.nativeEvent.data);
       if(message.nativeEvent.data.indexOf("f_get_idx") > 0 ){
         this.postTokenId(this.parsingDeviceId(message.nativeEvent.data));
       }
@@ -71,7 +79,7 @@ class MainScene extends React.Component {
       scalesPageToFit: true
     });
     if(navState.url == "http://www.checkhall.com/plan/search/"){
-      console.info("call injectJavaScript ", navState);
+      console.info("[MainScene] call injectJavaScript ", navState);
       this.webview.injectJavaScript("window.postMessage(window.f_get_idx);");
     }
   };
@@ -82,10 +90,10 @@ class MainScene extends React.Component {
     try{
         tokenValue = await AsyncStorage.getItem('@CheckHallStore:pushToken');
         deviceUniqueValue = await AsyncStorage.getItem('@CheckHallStore:deviceUniqueId');
-        console.log("tokenValue " + tokenValue);
-        console.log("deviceUniqueValue " + deviceUniqueValue);
+        console.log("[MainScene] tokenValue ", tokenValue);
+        console.log("[MainScene] deviceUniqueValue ", deviceUniqueValue);
     } catch(error) {
-        console.log("getDeviceTokenId error ", error);
+        console.log("[MainScene] getDeviceTokenId error ", error);
         return;
     }
 
@@ -96,7 +104,7 @@ class MainScene extends React.Component {
       'push_token': tokenValue
     };
 
-    console.log("postTokenId params ", params);
+    console.log("[MainScene] postTokenId params ", params);
 
     var formBody = [];
     for (var property in params) {
@@ -115,17 +123,16 @@ class MainScene extends React.Component {
     };
     fetch("http://m.checkhall.com/member/setPushToken.jsp", request)
       .then((response) =>{
-        console.info(response);
+        console.info("[MainScene] setPushToken result ", response);
       })
       .catch((error) => {
-        console.error(error);
+        console.error("[MainScene] setPushToken error ",error);
       });
   };
 
 
   onShouldStartLoadWithRequest = (event) => {
-    console.log("onShouldStartLoadWithRequest ", event);
-    // Implement any custom loading logic here, don't forget to return!
+    console.log("[MainScene] onShouldStartLoadWithRequest ", event);
     return true;
   };
 }
