@@ -10,7 +10,7 @@ import {
 import Button from "react-native-button";
 import {Actions} from "react-native-router-flux";
 
-var DEFAULT_URL = 'http://www.checkhall.com';
+var DEFAULT_URL = 'http://www.checkhall.com/member/login.jsp';
 
 class MainScene extends React.Component {
   state = {
@@ -29,7 +29,7 @@ class MainScene extends React.Component {
           ref={webview => { this.webview = webview; }}
           style={styles.webView}
           automaticallyAdjustContentInsets={false}
-          source={{uri: this.state.url}}
+          source={{uri: DEFAULT_URL}}
           javaScriptEnabled={true}
           domStorageEnabled={true}
           decelerationRate="normal"
