@@ -15,16 +15,16 @@ export default class PushController extends Component {
     FCM.requestPermissions();
 
     FCM.getFCMToken().then(token => {
-      console.log("TOKEN (getFCMToken)", token);
+      console.log("[PushController]TOKEN (getFCMToken)", token);
       this.props.onChangeToken(token);
     });
 
     FCM.getInitialNotification().then(notif => {
-      console.log("INITIAL NOTIFICATION", notif)
+      console.log("[PushController]INITIAL NOTIFICATION", notif)
     });
 
     this.notificationListner = FCM.on(FCMEvent.Notification, notif => {
-      console.log("notificationListner", notif);
+      console.log("[PushController]notificationListner ", notif);
       if(notif.local_notification){
         return;
       }
@@ -53,13 +53,13 @@ export default class PushController extends Component {
     });
 
     this.refreshTokenListener = FCM.on(FCMEvent.RefreshToken, token => {
-      console.log("TOKEN (refreshUnsubscribe)", token);
+      console.log("[PushController]refreshTokenListener TOKEN=", token);
       this.props.onChangeToken(token);
     });
   }
 
   showLocalNotification(notif) {
-    console.log("showLocalNotification", notif);
+    console.log("[PushController]showLocalNotification ", notif);
     FCM.presentLocalNotification({
       title: notif.title,
       body: notif.body,
