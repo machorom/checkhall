@@ -66,30 +66,32 @@ class Launch extends React.Component {
       }
     });
 
-    this.setDeviceUniqueId(DeviceInfo.getUniqueID());
-    console.log("[Launch] DeviceInfo");
-    console.log("getVersion = " + DeviceInfo.getVersion());
-    console.log("getUniqueID = " + DeviceInfo.getUniqueID());
-    console.log("getManufacturer = " + DeviceInfo.getManufacturer());
-    console.log("getBrand = " + DeviceInfo.getBrand());
-    console.log("getModel = " + DeviceInfo.getModel());
-    console.log("getDeviceId = " + DeviceInfo.getDeviceId());
-    console.log("getSystemName = " + DeviceInfo.getSystemName());
-    console.log("getSystemVersion = " + DeviceInfo.getSystemVersion());
-    console.log("getBundleId = " + DeviceInfo.getBundleId());
-    console.log("getBuildNumber = " + DeviceInfo.getBuildNumber());
-    console.log("getDeviceName = " + DeviceInfo.getDeviceName());
-    console.log("getUserAgent = " + DeviceInfo.getUserAgent());
+    // this.setDeviceUniqueId(DeviceInfo.getUniqueID());
+    // console.log("[Launch] DeviceInfo");
+    // console.log("getVersion = " + DeviceInfo.getVersion());
+    // console.log("getUniqueID = " + DeviceInfo.getUniqueID());
+    // console.log("getManufacturer = " + DeviceInfo.getManufacturer());
+    // console.log("getBrand = " + DeviceInfo.getBrand());
+    // console.log("getModel = " + DeviceInfo.getModel());
+    // console.log("getDeviceId = " + DeviceInfo.getDeviceId());
+    // console.log("getSystemName = " + DeviceInfo.getSystemName());
+    // console.log("getSystemVersion = " + DeviceInfo.getSystemVersion());
+    // console.log("getBundleId = " + DeviceInfo.getBundleId());
+    // console.log("getBuildNumber = " + DeviceInfo.getBuildNumber());
+    // console.log("getDeviceName = " + DeviceInfo.getDeviceName());
+    // console.log("getUserAgent = " + DeviceInfo.getUserAgent());
     console.log("================================================");
   }
 
 
 
   setDeviceUniqueId = async(uniqueId) => {
-    const value = await AsyncStorage.getItem('@CheckHallStore:deviceUniqueId');
-    console.log("[Launch]pre deviceUniqueId", value);
-    await AsyncStorage.setItem('@CheckHallStore:deviceUniqueId', uniqueId);
-    console.log("[Launch]copy deviceUniqueId to AsyncStorage", uniqueId);
+    if( uniqueId != null ){
+      const value = await AsyncStorage.getItem('@CheckHallStore:deviceUniqueId');
+      console.log("[Launch]pre deviceUniqueId", value);
+      await AsyncStorage.setItem('@CheckHallStore:deviceUniqueId', uniqueId);
+      console.log("[Launch]copy deviceUniqueId to AsyncStorage", uniqueId);
+    }
   }
 
   render(){
@@ -101,9 +103,11 @@ class Launch extends React.Component {
             onChangeToken={async(token) => {
               try{
                 const value = await AsyncStorage.getItem('@CheckHallStore:pushToken');
-                console.log("[Launch] pre token" + value)
+                console.log("[Launch] pre token ", value)
                 console.log("[Launch] copy token to AsyncStorage ", token);
-                await AsyncStorage.setItem('@CheckHallStore:pushToken', token);
+                if (typeof token != "undefined"){
+                  await AsyncStorage.setItem('@CheckHallStore:pushToken', token);
+                }
               } catch (error) {
                 console.log("[Launch] copy token to AsyncStorage error ", error);
               }
